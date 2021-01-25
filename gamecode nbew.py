@@ -88,7 +88,9 @@ class Level():
             """ Draw everything on this level. """
 
             # Draw the background
-            self.image = pygame.image.load("./images/platform")
+            background_image = pygame.image.load("./images/platform").convert()
+            background_position = [0, 0]
+            screen.blit(background_image, background_position)
 
             # Draw all the sprite lists that we have
             #self.platform_list.draw(screen)
