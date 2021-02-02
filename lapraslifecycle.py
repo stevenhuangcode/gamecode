@@ -230,7 +230,7 @@ class Level_03(Level):
             self.platform_list.add(block)
 
     def draw(self, screen):
-        # background for lvl 1
+        # background for lvl 3
         background_image = pygame.image.load("./images/background.png")
         background_position = [0, 0]
         screen.blit(background_image, background_position)
@@ -254,6 +254,7 @@ def main():
     all_sprites = pygame.sprite.Group()
 
     # ---- enemy variable
+    # add soon
     # ---- player variable
     player = Player()
     all_sprites.add(player)
