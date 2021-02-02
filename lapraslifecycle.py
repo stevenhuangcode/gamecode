@@ -207,9 +207,8 @@ class Level_03(Level):
     def __init__(self, player):
         # Call the parent constructor
         Level.__init__(self, player)
-
-        # final level so no level limit
-        #self.level_limit = -1000
+        
+        self.level_limit = -1000
 
         # background for lvl 3
         background_image = pygame.image.load("./images/background.png")
