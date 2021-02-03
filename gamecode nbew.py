@@ -1,5 +1,7 @@
 # game
 import pygame
+import random
+
 # ----- CONSTANTS
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -7,30 +9,32 @@ YELLOW = (255, 255, 0)
 SKY_BLUE = (95, 165, 228)
 WIDTH = 800
 HEIGHT = 600
-TITLE = "game"
+NUM_ENEMIES = 5
+TITLE = "lapras life-cycle"
+
 
 # create player class
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         # call super constructor
         super().__init__()
-        # get image
+
+        # get image and flip orientation
         self.lapras_left = pygame.image.load("./images/lapras.png")
         self.lapras_right = pygame.transform.flip(self.lapras_left, True, False)
-        self.image = self.lapras_right
+        self.image = self.lapras_left
 
         # scale to 64
-        self.image = pygame.transform.scale(self.image, (64,64))
+        self.lapras_left = pygame.transform.scale(self.lapras_left, (64, 64))
+        self.lapras_right = pygame.transform.scale(self.lapras_right, (64, 64))
 
         # make the hitbox
-        self.rect = self.image.get_rect()
+        self.rect = self.lapras_right.get_rect()
 
         # set speed
         self.vel_x = 0
         self.vel_y = 0
         self.level = None
-
-        # flip image depending on + or - velocity
 
     def update(self):
         # gravity
@@ -82,10 +86,30 @@ class Player(pygame.sprite.Sprite):
     # player movement keys
     def go_left(self):
         self.vel_x = -6
+
     def go_right(self):
         self.vel_x = 6
+
+    def fast_fall(self):
+        self.vel_y = 8
+
     def stop(self):
         self.vel_x = 0
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        # call super constructor
+        super().__init__()
+
+        self.image = pygame.image.load("./images/mario.png")
+        self.rect = self.image.get_rect()
+
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        # Move the enemy side-to-side
+        self.x_vel = 2
+        self.rect.bottom = 600
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, width, height):
@@ -95,6 +119,7 @@ class Platform(pygame.sprite.Sprite):
         # scale down
         self.image = pygame.transform.scale(self.image, (122, 32))
         self.rect = self.image.get_rect()
+
 
 class Level():
     def __init__(self, player):
@@ -118,11 +143,6 @@ class Level():
         # Draw the background
         screen.fill(WHITE)
 
-
-        #background_image = pygame.image.load("./images/ocean.png").convert()
-        #background_position = [0, 0]
-        #screen.blit(background_image, background_position)
-
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
@@ -136,24 +156,23 @@ class Level():
 
         # Go through all the sprite lists and shift
         for platform in self.platform_list:
-                platform.rect.x += shift_x
+            platform.rect.x += shift_x
+
 
 # Create platforms for the level
 class Level_01(Level):
-    """ Definition for level 1. """
     def __init__(self, player):
-        """ Create level 1. """
-
         # Call the parent constructor
         Level.__init__(self, player)
         self.level_limit = -1000
 
         # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
+        level = [[210, 70, 500, 550],
                  [210, 70, 800, 400],
                  [210, 70, 1000, 500],
                  [210, 70, 1120, 280],
                  ]
+
         # Go through the array above and add platforms
         for platform in level:
             block = Platform(platform[0], platform[1])
@@ -172,27 +191,19 @@ class Level_01(Level):
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
 
+
 class Level_02(Level):
-
-    # # background for lvl 2
-    # background_image = pygame.image.load("./images/beach.png")
-    # background_position = [0, 0]
-    # screen.blit(background_image, background_position)
-    # """ Definition for level 2. """
-
     def __init__(self, player):
-        """ Create level 1. """
-
         # Call the parent constructor
         Level.__init__(self, player)
 
         self.level_limit = -1000
 
         # Array with type of platform, and x, y location of the platform.
-        level = [[210, 30, 450, 570],
-                 [210, 30, 850, 420],
-                 [210, 30, 1000, 520],
-                 [210, 30, 1120, 280],
+        level = [[210, 30, 400, 550],
+                 [210, 30, 600, 420],
+                 [210, 30, 750, 290],
+                 [210, 30, 920, 150],
                  ]
 
         # Go through the array above and add platforms
@@ -202,6 +213,56 @@ class Level_02(Level):
             block.rect.y = platform[3]
             block.player = self.player
             self.platform_list.add(block)
+
+    def draw(self, screen):
+        # background for lvl 2
+        background_image = pygame.image.load("./images/beach.jpg")
+
+        # this image has to be scaled
+        background_image = pygame.transform.scale(background_image, (800, 600))
+        background_position = [0, 0]
+        screen.blit(background_image, background_position)
+
+        # Draw all the sprite lists that we have
+        self.platform_list.draw(screen)
+        self.enemy_list.draw(screen)
+
+
+class Level_03(Level):
+    def __init__(self, player):
+        # Call the parent constructor
+        Level.__init__(self, player)
+
+        self.level_limit = -1000
+
+        # background for lvl 3
+        background_image = pygame.image.load("./images/background.png")
+
+        # Array with width, height, x, and y of platform
+        level = [[210, 70, 500, 5600],
+                 [210, 70, 800, 400],
+                 [210, 70, 1000, 500],
+                 [210, 70, 1120, 280],
+                 ]
+
+        # Go through the array above and add platforms
+        for platform in level:
+            block = Platform(platform[0], platform[1])
+            block.rect.x = platform[2]
+            block.rect.y = platform[3]
+            block.player = self.player
+            self.platform_list.add(block)
+
+    def draw(self, screen):
+        # background for lvl 3
+        background_image = pygame.image.load("./images/background.png")
+        background_position = [0, 0]
+        screen.blit(background_image, background_position)
+
+        # Draw all the sprite lists that we have
+        self.platform_list.draw(screen)
+        self.enemy_list.draw(screen)
+
 
 def main():
     pygame.init()
@@ -218,6 +279,12 @@ def main():
     all_sprites = pygame.sprite.Group()
 
     # ---- enemy variable
+    enemy = Enemy()
+    for i in range(NUM_ENEMIES):
+        enemy = Enemy()
+        enemy.rect.x = enemy.rect.x - random.choice([-400, -200])
+        all_sprites.add(enemy)
+
     # ---- player variable
     player = Player()
     all_sprites.add(player)
@@ -226,6 +293,7 @@ def main():
     level_list = []
     level_list.append(Level_01(player))
     level_list.append(Level_02(player))
+    level_list.append(Level_03(player))
 
     # spawn-point?
     player.rect.x = 64
@@ -245,12 +313,14 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     player.go_left()
-                    # player.image = player.lapras_left
+                    player.image = player.lapras_left
                 if event.key == pygame.K_RIGHT:
                     player.go_right()
-                    # player.image = player.lapras_right
+                    player.image = player.lapras_right
                 if event.key == pygame.K_UP:
                     player.jump()
+                if event.key == pygame.K_DOWN:
+                    player.fast_fall()
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and player.vel_x < 0:
@@ -293,6 +363,7 @@ def main():
         current_level.update()
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
